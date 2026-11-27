@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>X/IG → Tumblr 設定</title>
+<style>
+  :root { --bg:#15202b; --card:#1a2530; --border:#38444d; --text:#e7e9ea; --dim:#8b98a5; --accent:#1d9bf0; --tumblr:#00b8ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  .sub { color: var(--dim); font-size: 12px; margin: 0 0 20px; }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  label { display: block; color: var(--dim); font-size: 12px; margin: 10px 0 4px; }
+  input[type=text], input[type=password], input[type=number], textarea {
+    width: 100%; background: #1c2732; border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    padding: 8px 10px; font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  textarea { min-height: 90px; resize: vertical; }
+  input[type=number] { width: 90px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  button { font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--text); }
+  button.primary { background: var(--tumblr); border-color: var(--tumblr); color: #0a1620; font-weight: 700; }
+  button.danger { color: #f4212e; }
+  button:disabled { opacity: .5; cursor: default; }
+  code { background: #0f1419; border: 1px solid var(--border); border-radius: 6px; padding: 2px 6px; font-size: 12px; word-break: break-all; }
+  .msg { font-size: 12px; min-height: 1.2em; margin-top: 8px; color: var(--dim); white-space: pre-wrap; }
+  .msg.err { color: #f4212e; } .msg.ok { color: #00ba7c; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { color: var(--dim); font-weight: 500; font-size: 12px; }
+  td input[type=text] { padding: 4px 8px; font-family: inherit; }
+  .empty { color: var(--dim); font-size: 12px; }
+  ol { margin: 6px 0 0; padding-left: 20px; color: var(--dim); font-size: 12px; }
+  details summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>X/IG → Tumblr 設定</h1>
+  <p class="sub">X と Instagram のポストに出る <b>t</b> ボタンから、Tumblr API（OAuth1）で直接投稿します。キーとトークンはこのブラウザの拡張機能ストレージにだけ保存されます。</p>
+
+  <section>
+    <h2>1. Tumblr アプリのキー</h2>
+    <ol>
+      <li><a href="https://www.tumblr.com/oauth/apps" target="_blank" rel="noopener">tumblr.com/oauth/apps</a> でアプリを登録（X-Ray で登録済みのアプリを流用してもOK）</li>
+      <li>「Default callback URL」に次のURLを設定：<br><code id="redirect"></code></li>
+    </ol>
+    <label for="ck">OAuth Consumer Key</label>
+    <input type="text" id="ck" autocomplete="off" spellcheck="false">
+    <label for="cs">Secret Key</label>
+    <input type="password" id="cs" autocomplete="off" spellcheck="false">
+    <div class="row"><button id="saveKeys">保存</button></div>
+    <div class="msg" id="keysMsg"></div>
+  </section>
+
+  <section>
+    <h2>2. Tumblr アカウントを連携</h2>
+    <div class="row" style="margin-top:0">
+      <button class="primary" id="connect">Tumblr と連携する</button>
+      <span class="empty">別の Tumblr アカウントを足すときは、先に tumblr.com で切り替えてから押してください</span>
+    </div>
+    <div class="msg" id="connectMsg"></div>
+    <details style="margin-top:10px">
+      <summary>X-Ray の tumblr_accounts.json から取り込む</summary>
+      <label for="importJson">ファイルの中身を貼り付け（<code>{"accounts":[{label, blog, token, secret}]}</code>）</label>
+      <textarea id="importJson" spellcheck="false"></textarea>
+      <div class="row"><button id="doImport">取り込む</button></div>
+      <div class="msg" id="importMsg"></div>
+    </details>
+  </section>
+
+  <section>
+    <h2>3. 投稿先</h2>
+    <div id="accounts"></div>
+    <div class="msg" id="acctMsg"></div>
+  </section>
+
+  <section>
+    <h2>4. 投稿の設定</h2>
+    <label for="th">この枚数以上を選んだら自動で下書きにする（0で無効）</label>
+    <input type="number" id="th" min="0" max="10">
+    <div class="row"><button id="saveSettings">保存</button></div>
+    <div class="msg" id="setMsg"></div>
+  </section>
+
+  <section>
+    <h2>5. 覚えているキャプション／タグ</h2>
+    <p class="empty" style="margin:0 0 8px">投稿に成功するとアカウントごとに保存され、次回同じアカウントのポストで自動入力されます（リンクは保存しません）。</p>
+    <div id="presets"></div>
+  </section>
+</main>
+<script src="lib/oauth1.js"></script>
+<script src="lib/store.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# 配布物・パッケージ
+*.zip
+*.crx
+# 拡張の署名鍵（manifest の key と対になる秘密鍵。絶対にコミットしない）
+*.pem
+
+# Tumblr のトークン類（X-Ray から取り込むときに手元へ置いたコピーなど）
+tumblr_accounts.json
+*.secret
+.env
+.env.*
+
+# テスト・検証の生成物
+node_modules/
+tests/*.png
+test-results/
+playwright-report/
+__pycache__/
+*.pyc
+
+# エディタ・OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

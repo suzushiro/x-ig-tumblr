@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "X/IG → Tumblr",
+  "version": "1.0.3",
+  "description": "X と Instagram のポストに Tumblr 投稿ボタン（t）を追加。キャプションは元投稿へのリンク、アカウントごとにキャプションとタグを記憶。",
+  "permissions": [
+    "storage",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://api.tumblr.com/*",
+    "https://www.tumblr.com/oauth/*",
+    "https://pbs.twimg.com/*",
+    "https://*.cdninstagram.com/*",
+    "https://*.fbcdn.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*",
+        "https://mobile.x.com/*"
+      ],
+      "js": [
+        "content/modal.js",
+        "content/x.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.instagram.com/*"
+      ],
+      "js": [
+        "content/modal.js",
+        "content/ig.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "X/IG → Tumblr 設定"
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArPmJaDrz5VWSPne1/nAkh8vtcK+6BucjLT7pmXrkdWVs7O0aCZ5puQ4juv65yazg0wjEN2DaxCDghXmpjpGseoVU94e4z9Tv0vkNCHa7vSrMjntaOOxpobj5vZfLSGjwwDcVNnh3gmXhoQDvs9NkMBIvNLVpXQQgz+12RKgmGQamBx/h5lbvYkYzm6LIU2prSlClB/3CbmSiPmQc4nu6f81AHiWbyAiRYme1UcIgWh7rQV6uG0HVf7uRkxT+APIvMINDv2PV44PB7cf5NAK6PEKp5RP2/OpMUT82BoLoSlEygwWpVZ4qFrH3G3T4jFV7PhRCpIvjByvBZQeYu+2wHQIDAQAB"
+}
